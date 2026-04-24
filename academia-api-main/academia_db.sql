@@ -1,0 +1,97 @@
+CREATE TABLE IF NOT EXISTS `users` (
+	`id` INTEGER NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(255) NOT NULL,
+	`email` VARCHAR(255) NOT NULL,
+	`email_verified_at` TIMESTAMP NULL DEFAULT NULL,
+	`password` VARCHAR(255) NOT NULL,
+	`remember_token` VARCHAR(100) NULL DEFAULT NULL,
+	`created_at` TIMESTAMP NULL DEFAULT NULL,
+	`updated_at` TIMESTAMP NULL DEFAULT NULL,
+	PRIMARY KEY(`id`),
+	UNIQUE KEY `uq_users_email` (`email`)
+);
+
+
+CREATE TABLE IF NOT EXISTS `instrutores` (
+	`id` INTEGER NOT NULL AUTO_INCREMENT,
+	`user_id` INTEGER NOT NULL,
+	`especialidade` VARCHAR(255) NOT NULL,
+	`created_at` TIMESTAMP NULL DEFAULT NULL,
+	`updated_at` TIMESTAMP NULL DEFAULT NULL,
+	PRIMARY KEY(`id`),
+	UNIQUE KEY `uq_instrutores_user_id` (`user_id`)
+);
+
+
+CREATE TABLE IF NOT EXISTS `planos` (
+	`id` INTEGER NOT NULL AUTO_INCREMENT,
+	`nome` VARCHAR(255) NOT NULL,
+	`preco` DECIMAL(8,2) NOT NULL,
+	`duracao_dias` INTEGER NOT NULL,
+	`created_at` TIMESTAMP NULL DEFAULT NULL,
+	`updated_at` TIMESTAMP NULL DEFAULT NULL,
+	PRIMARY KEY(`id`)
+);
+
+
+CREATE TABLE IF NOT EXISTS `alunos` (
+	`id` INTEGER NOT NULL AUTO_INCREMENT,
+	`user_id` INTEGER NOT NULL,
+	`telefone` VARCHAR(20) NULL DEFAULT NULL,
+	`data_nascimento` DATE NULL DEFAULT NULL,
+	`created_at` TIMESTAMP NULL DEFAULT NULL,
+	`updated_at` TIMESTAMP NULL DEFAULT NULL,
+	PRIMARY KEY(`id`),
+	UNIQUE KEY `uq_alunos_user_id` (`user_id`)
+);
+
+
+CREATE TABLE IF NOT EXISTS `matriculas` (
+	`id` INTEGER NOT NULL AUTO_INCREMENT,
+	`aluno_id` INTEGER NOT NULL,
+	`plano_id` INTEGER NOT NULL,
+	`data_inicio` DATE NOT NULL,
+	`data_fim` DATE NOT NULL,
+	`status` ENUM('ativa', 'inativa', 'suspensa') NOT NULL DEFAULT 'ativa',
+	`created_at` TIMESTAMP NULL DEFAULT NULL,
+	`updated_at` TIMESTAMP NULL DEFAULT NULL,
+	PRIMARY KEY(`id`)
+);
+
+
+CREATE TABLE IF NOT EXISTS `aulas` (
+	`id` INTEGER NOT NULL AUTO_INCREMENT,
+	`matricula_id` INTEGER NOT NULL,
+	`instrutor_id` INTEGER NOT NULL,
+	`nome` VARCHAR(255) NOT NULL,
+	`horario` DATETIME NOT NULL,
+	`vagas` INTEGER NOT NULL,
+	`created_at` TIMESTAMP NULL DEFAULT NULL,
+	`updated_at` TIMESTAMP NULL DEFAULT NULL,
+	PRIMARY KEY(`id`)
+);
+
+
+ALTER TABLE `instrutores`
+ADD FOREIGN KEY(`user_id`) REFERENCES `users`(`id`)
+ON UPDATE NO ACTION ON DELETE CASCADE;
+
+ALTER TABLE `alunos`
+ADD FOREIGN KEY(`user_id`) REFERENCES `users`(`id`)
+ON UPDATE NO ACTION ON DELETE CASCADE;
+
+ALTER TABLE `matriculas`
+ADD FOREIGN KEY(`aluno_id`) REFERENCES `alunos`(`id`)
+ON UPDATE NO ACTION ON DELETE CASCADE;
+
+ALTER TABLE `matriculas`
+ADD FOREIGN KEY(`plano_id`) REFERENCES `planos`(`id`)
+ON UPDATE NO ACTION ON DELETE CASCADE;
+
+ALTER TABLE `aulas`
+ADD FOREIGN KEY(`matricula_id`) REFERENCES `matriculas`(`id`)
+ON UPDATE NO ACTION ON DELETE CASCADE;
+
+ALTER TABLE `aulas`
+ADD FOREIGN KEY(`instrutor_id`) REFERENCES `instrutores`(`id`)
+ON UPDATE NO ACTION ON DELETE CASCADE;
